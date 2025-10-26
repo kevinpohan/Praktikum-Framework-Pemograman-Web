@@ -20,12 +20,13 @@ Route::middleware('auth')->group(function () {
 });
 
 
+
 Route::get('/product', action: [ProductController::class, 'index'])->name('product-index');
 Route::get('/product/create', action: [ProductController::class, 'create'])->name('product-create');
 Route::post('/product', action: [ProductController::class, 'store'])->name('product-store');
-Route::get('/product/{id}', action: [ProductController::class, 'show']);
+Route::get('/product/{id}', action: [ProductController::class, 'show'])->name("product-detail");
 Route::get('/product/{id}/edit', action: [ProductController::class, 'edit'])->name('product-edit');
 Route::put('/product/{id}', action: [ProductController::class, 'update'])->name('product-update');
-Route::delete('/product/{id}', action: [ProductController::class, 'destroy']);
+Route::delete('/product/{id}', action: [ProductController::class, 'destroy'])->name('product-destroy');
 
 require __DIR__ . '/auth.php';
