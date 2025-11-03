@@ -22,7 +22,6 @@
                 <input type="text" name="search" value="{{ request('search') }}"
                     placeholder="Cari produk..." class="w-1/4 rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500">
 
-                {{-- Tambahkan input tersembunyi untuk menyimpan state sorting --}}
                 <input type="hidden" name="sort_by" value="{{ request('sort_by') }}">
                 <input type="hidden" name="sort_direction" value="{{ request('sort_direction') }}">
 
@@ -38,8 +37,26 @@
     <div class="container p-4 mx-auto">
         <div class="overflow-x-auto">
             <a href="{{ route('product-create') }}">
-                <button class="px-6 py-4 text-white bg-green-500 border border-green-500 rounded-lg shadow-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500">
+                <button class="px-6 py-4 text-white bg-blue-500 border border-blue-500 rounded-lg shadow-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
                     Add product data
+                </button>
+            </a>
+
+            <a href="{{ route('product.export.excel') }}" class="btn btn-success">
+                <button class="px-6 py-4 text-white bg-green-500 border border-green-500 rounded-lg shadow-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500">
+                    Export Excel
+                </button>
+            </a>
+
+            <a href="{{ route('product.export.pdf') }}" class="btn btn-danger">
+                <button class="px-6 py-4 text-white bg-red-500 border border-red-500 rounded-lg shadow-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500">
+                    Export PDF
+                </button>
+            </a>
+
+            <a href="{{ route('product.export.jpg') }}" class="btn btn-warning">
+                <button class="px-6 py-4 text-white bg-yellow-500 border border-yellow-500 rounded-lg shadow-lg hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                    Export JPG
                 </button>
             </a>
 
@@ -58,13 +75,18 @@
                         $newDirection = ($currentSortBy == $column && $currentDirection == 'asc') ? 'desc' : 'asc';
 
                         // Buat query string baru
-                        $queryString = http_build_query(array_merge(request()->except(['sort_by', 'sort_direction', 'page']), [
+                        $queryString = http_build_query(array_merge(
+                        request()->except(['sort_by', 'sort_direction', 'page']),
+                        [
                         'sort_by' => $column,
-                        'sort_direction' => $newDirection
-                        ]));
+                        'sort_direction' => $newDirection,
+                        ]
+                        ));
 
                         // Tentukan indikator panah (Opsional)
-                        $arrow = ($currentSortBy == $column) ? ($currentDirection == 'asc' ? ' ↑' : ' ↓') : '';
+                        $arrow = ($currentSortBy == $column)
+                        ? ($currentDirection == 'asc' ? ' ↑' : ' ↓')
+                        : '';
 
                         return '<th class="px-4 py-2 text-left text-gray-600 border border-gray-200">' .
                             '<a href="?' . $queryString . '" class="flex items-center hover:text-green-500">' .

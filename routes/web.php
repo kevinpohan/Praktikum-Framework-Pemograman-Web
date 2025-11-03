@@ -29,4 +29,12 @@ Route::get('/product/{id}/edit', action: [ProductController::class, 'edit'])->na
 Route::put('/product/{id}', action: [ProductController::class, 'update'])->name('product-update');
 Route::delete('/product/{id}', action: [ProductController::class, 'destroy'])->name('product-destroy');
 
+Route::get('/product-export-excel', [ProductController::class, 'exportExcel'])->name('product.export.excel');
+
+Route::get('/product-export-pdf', [ProductController::class, 'exportPDF'])->name('product.export.pdf');
+
+Route::get('/product-export-jpg', [ProductController::class, 'exportJPG'])->name('product.export.jpg');
+
+
+
 require __DIR__ . '/auth.php';

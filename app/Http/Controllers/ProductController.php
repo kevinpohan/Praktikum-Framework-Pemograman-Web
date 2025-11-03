@@ -3,7 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Imagick;
 use App\Models\Product;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\ProductsExport;
+
 
 class ProductController extends Controller
 {
@@ -135,5 +140,46 @@ class ProductController extends Controller
             );
         }
         return redirect()->route('product-index')->with('error', 'Product tidak ditemukan.');
+    }
+
+
+    public function exportExcel()
+    {
+        return Excel::download(new ProductsExport, 'recap-product.xlsx');
+    }
+
+    public function exportPDF()
+    {
+        $products = Product::all();
+
+        $pdf = Pdf::loadView('master-data.product-master.export-pdf', compact('products'))
+            ->setPaper('A4', 'landscape');
+
+        return $pdf->download('laporan-produk.pdf');
+    }
+
+
+    public function exportJPG()
+    {
+        $products = Product::all();
+
+        // Generate PDF first
+        $pdf = Pdf::loadView('master-data.product-master.export-pdf', compact('products'))
+            ->setPaper('A4', 'landscape');
+
+        // Save to storage temporary
+        $pdfPath = storage_path('app/public/report_temp.pdf');
+        file_put_contents($pdfPath, $pdf->output());
+
+        // Convert first page of PDF to JPG
+        $image = new Imagick();
+        $image->setResolution(200, 200);
+        $image->readImage($pdfPath . '[0]');
+        $image->setImageFormat('jpg');
+
+        $jpgPath = storage_path('app/public/report.jpg');
+        $image->writeImage($jpgPath);
+
+        return response()->download($jpgPath, 'laporan-produk.jpg');
     }
 }
