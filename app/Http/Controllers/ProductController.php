@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Imagick;
 use App\Models\Product;
+use App\Models\Supplier;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ProductsExport;
 
@@ -27,7 +28,7 @@ class ProductController extends Controller
         // Daftar kolom yang diizinkan untuk sorting
         $allowedSorts = ['id', 'product_name', 'unit', 'type', 'information', 'qty', 'producer'];
 
-        $query = Product::query();
+        $query = Product::with('supplier');
 
         // Menerapkan Searching
         if ($search) {
@@ -45,6 +46,7 @@ class ProductController extends Controller
         }
 
         $data = $query->paginate(4);
+        //return $data;
 
         // Tambahkan parameter searching dan sorting ke link pagination
         $data->appends($request->only('search', 'sort_by', 'sort_direction'));
@@ -57,7 +59,8 @@ class ProductController extends Controller
      */
     public function create()
     {
-        return view("master-data.product-master.create-product");
+        $suppliers = Supplier::all();
+        return view("master-data.product-master.create-product", compact('suppliers'));
     }
 
     /**
@@ -73,6 +76,7 @@ class ProductController extends Controller
             'information' => 'nullable|string',
             'qty' => 'required|integer',
             'producer' => 'required|string|max:255',
+            'supplier_id' => 'required|exists:suppliers,id',
         ]);
 
         // Proses simpan data kedalam database
@@ -96,7 +100,8 @@ class ProductController extends Controller
     public function edit(string $id)
     {
         $product = Product::findorFail($id);
-        return view("master-data.product-master.edit-product", compact("product"));
+        $suppliers = Supplier::all();
+        return view("master-data.product-master.edit-product", compact("product", "suppliers"));
     }
 
     /**
@@ -111,6 +116,7 @@ class ProductController extends Controller
             'information' => 'nullable|string',
             'qty' => 'required|integer|min:1',
             'producer' => 'required|string|max:255',
+            'supplier_id' => 'required|exists:suppliers,id',
         ]);
 
         $product = Product::findOrFail($id);
@@ -121,6 +127,7 @@ class ProductController extends Controller
             'information' => $request->information,
             'qty' => $request->qty,
             'producer' => $request->producer,
+            'supplier_id' => $request->supplier_id,
         ]);
 
         return redirect()->route('product-index')->with('success', 'Product update successfully!');
